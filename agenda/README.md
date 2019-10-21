@@ -1,5 +1,7 @@
 # 服务计算 - Agenda
 
+Go Online 地址： http://139.9.57.167:20080/share/bmmm1t676kvs669u2230?secret=false
+
 本程序使用 `go modules` 管理源代码和依赖包。请确保你的 Go 环境为 1.13。
 
 ## 实验过程
