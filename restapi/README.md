@@ -47,7 +47,7 @@ POST /api/v1/users
 ## 用户登录
 
 ```
-GET /api/v1/users/login
+POST /api/v1/users/login
 ```
 
 ### Input
@@ -83,7 +83,7 @@ GET /api/v1/users/login
 }
 ```
 
-## 获取图形验证码 id
+## 获取图形验证码
 
 ```
 GET /api/v1/users/captcha
@@ -94,29 +94,13 @@ GET /api/v1/users/captcha
 > Status: 200 OK
 >
 > Location: /api/v1/users/captcha
+>
 
 ```json
 {
-    "captchaId": "UUID"
+	"captchaId": "d9dff092-0a72-11ea-a190-e3992fb39aa7",
+    "captcha": "ZGphIGhnb2hlaW8gamZtZWhpd21qaGdlOWN3a2lqeDBsamlvdGV3cWssaGMgMHI4MzIgMGowOWlqdltrY3dmeGxwa3NkcGFkCg==" // 图形验证码（png）的 BASE64 编码
 }
-```
-
-## 获取图形验证码
-
-```
-GET /api/v1/users/captcha/:captchaId
-```
-
-### Response
-
-> Status: 200 OK
->
-> Location: /api/v1/users/captcha/UUID
->
-> Content-Type: application/png
-
-```json
-这里是一个图片的二进制
 ```
 
 ## 获取分类列表
@@ -226,6 +210,20 @@ PUT /api/v1/categories/:categoryId
 }
 ```
 
+## 删除分类
+
+仅管理员可以删除分类，否则返回 `401 Unauthorized`
+
+```
+DELETE /api/v1/categories/:categoryId
+```
+
+### Response
+
+> Status: 204 No Content
+>
+> Location: /api/v1/categories/1
+
 ## 获取分类内的文章
 
 根据分类 id 获取文章列表
@@ -263,6 +261,28 @@ GET /api/v1/categories/:categoryId
             "createdAt": "2019-11-18T22:00:01Z"
         }
     ]
+}
+```
+
+## 获取文章
+
+```
+GET /api/v1/articles/:articleId
+```
+
+### Response
+
+> Status: 200 OK
+>
+> Location: /api/v1/articles/0
+
+```json
+{
+    "id": 0,
+    "categoryId": 0,
+    "categoryName": "程序设计",
+    "title": "C 语言的内存管理机制",
+    "content": "malloc 就完事了！"
 }
 ```
 
@@ -312,7 +332,7 @@ POST /api/v1/articles
 仅管理员可以更新文章，否则返回 `401 Unauthorized`
 
 ```
-PUT /api/v1/articles/3
+PUT /api/v1/articles/:articleId
 ```
 
 ### Input
@@ -353,12 +373,12 @@ PUT /api/v1/articles/3
 仅管理员可以删除文章，否则返回 `401 Unauthorized`
 
 ```
-DELETE /api/v1/articles/1
+DELETE /api/v1/articles/:articleId
 ```
 
 ### Response
 
-> Status: 200 OK
+> Status: 204 No Content
 >
 > Location: /api/v1/articles/1
 
@@ -367,3 +387,160 @@ DELETE /api/v1/articles/1
 ```
 GET /api/v1/articles/:articleId/comments
 ```
+
+### Parameters
+
+| 名称      | 类型   | 描述                                    |
+| --------- | ------ | --------------------------------------- |
+| unaudited | /      | 存在该参数时改为获取待审核评论          |
+| sort      | string | 排序方式<br />sort=id,DESC 表示 id 逆序 |
+| page      | number | 页码                                    |
+| size      | number | 页内项数                                |
+
+### Response
+
+> Status: 200 OK
+>
+> Location: /api/v1/articles/
+
+```json
+[
+    {
+        "id": "0",
+        "user": {
+            "id": 0,
+            "username": "huangyuhui",
+            "nickname": "huangyuhui"
+        },
+        "content": "tql",
+        "createdAt": "2019-11-19T00:00:00Z"
+    },
+    {
+        "id": "2",
+        "user": {
+            "id": 0,
+            "username": "huangyuhui",
+            "nickname": "huangyuhui"
+        },
+        "content": "tqltql",
+        "createdAt": "2019-11-19T01:00:00Z"
+    }
+]
+```
+
+## 添加评论
+
+仅登录用户可以创建评论，否则返回 `401 Unauthorized`
+
+```
+POST /api/v1/articles/:articleId/comments
+```
+
+### Input
+
+| 名称    | 类型   | 描述                    |
+| ------- | ------ | ----------------------- |
+| content | string | 评论内容，Markdown 格式 |
+
+#### Example
+
+```json
+{
+    "content": "tql"
+}
+```
+
+### Response
+
+> Status: 202 Accepted
+>
+> Location: /api/v1/articles/0/comments
+
+```json
+{
+    "id": "0",
+    "user": {
+        "id": 0,
+        "username": "huangyuhui",
+        "nickname": "huangyuhui"
+    },
+    "content": "tql",
+    "createdAt": "2019-11-19T00:00:00Z"
+}
+```
+
+## 更新评论
+
+仅评论用户可以更新评论，否则返回 `401 Unauthorized`
+
+```
+POST /api/v1/articles/:articleId/comments/:commentId
+```
+
+### Input
+
+| 名称    | 类型   | 描述                    |
+| ------- | ------ | ----------------------- |
+| content | string | 评论内容，Markdown 格式 |
+
+#### Example
+
+```json
+{
+    "content": "tql"
+}
+```
+
+### Response
+
+> Status: 200 OK
+>
+> Location: /api/v1/articles/0/comments/0
+
+```json
+{
+    "id": "0",
+    "user": {
+        "id": 0,
+        "username": "huangyuhui",
+        "nickname": "huangyuhui"
+    },
+    "content": "tql",
+    "createdAt": "2019-11-19T00:01:00Z"
+}
+```
+
+## 删除评论
+
+仅用户自己和管理员可以删除评论，否则返回 `401 Unauthorized`
+
+```
+DELETE /api/v1/articles/:articleId/comments/:commentId
+```
+
+### Response
+
+> Status: 204 No Content
+>
+> Location: /api/v1/articles/1/comments/1
+
+## 审核评论
+
+仅管理员可以审核评论，否则返回`401 Unauthorized`
+
+```
+GET /api/v1/articles/:articleId/comments/:commentId/audit
+```
+
+### Parameters
+
+| 名称   | 类型 | 描述           |
+| ------ | ---- | -------------- |
+| accept | /    | 审核通过该评论 |
+| deny   | /    | 不通过该评论   |
+
+### Response
+
+> Status: 204 No Content
+>
+> Location: /api/v1/articles/0/comments/0
